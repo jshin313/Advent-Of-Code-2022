@@ -71,7 +71,7 @@ class File
         }
 };
 
-void part1() {
+File* create_tree_from_input() {
     string s;
 
     // Assume first command is cd <dir_name>
@@ -121,61 +121,15 @@ void part1() {
     // Update directory sizes
     root->update_sizes();
 
-
-    cout << root->find_sum_of_less_than_100k(root) << endl;
+    return root;
 
 }
 
-void part2(unsigned int total_space, unsigned int update_size) {
-    string s;
+void part1(File* root) {
+    cout << root->find_sum_of_less_than_100k(root) << endl;
+}
 
-    // Assume first command is cd <dir_name>
-    File* root = new File();
-    cin >> s >> s >> root->name;
-
-    File* current_dir = root;
-    root->is_dir = true;
-
-    while (cin >> s) {
-        if (s == "$") {
-            string command, argument;
-            cin >> command;
-            if (command == "ls") {
-
-            } else if (command == "cd") {
-                cin >> argument;
-                
-                // Switch to where the cd <argument> directory
-                if (argument == "..") {
-                    current_dir = current_dir->parent;
-                } else {
-                    current_dir = current_dir->children[argument];
-                }
-            }
-        } else {
-            string file_name; cin >> file_name;
-
-            if (current_dir->children.find(file_name) == current_dir -> children.end()) {
-                
-                // Add new file to parent
-                File* file = new File(file_name);
-                file->parent=current_dir;
-                current_dir->children[file_name] = file;
-
-                file->is_dir = (s == "dir");
-                if (!file->is_dir) {
-                    file->size = std::stoi(s);
-                    // Update parent file_size
-                    current_dir->size += file->size;
-
-                }
-            }
-        }
-    }
-
-    // Update directory sizes
-    root->update_sizes();
-
+void part2(File* root, unsigned int total_space, unsigned int update_size) {
     int space_needed = update_size - (total_space - root->size);
     cout << root->get_smallest_dir_to_delete(space_needed) << endl;
 
@@ -188,9 +142,12 @@ int main(int argc, char **argv)
     freopen("input.txt", "r", stdin);
     /* freopen("test.txt", "r", stdin); */
 
-    /* part1(); */
     unsigned int TOTAL_DISK_SPACE = 70000000;
     unsigned int UPDATE_SIZE = 30000000;
-    part2(TOTAL_DISK_SPACE, UPDATE_SIZE);
+
+
+    File* root = create_tree_from_input();
+    part1(root);
+    part2(root, TOTAL_DISK_SPACE, UPDATE_SIZE);
 
 }
